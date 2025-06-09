@@ -16,6 +16,14 @@ app.use(cors());
 // Middleware
 app.use(express.json()); // For parsing application/json
 
+
+// Logging middleware para rastrear cada petición
+app.use((req, res, next) => {
+    const now = new Date().toISOString();
+    const { method, url, ip } = req;
+    console.log(`[${now}] ${method} ${url} - IP: ${ip}`);
+    next();
+})
 // Routes
 app.use('/products', productRoutes);
 

@@ -1,30 +1,33 @@
-// app.js
 const express = require('express');
-const cors = require('cors'); // <-- 1. Importa cors
+const cors = require('cors');
 const clienteRoutes = require('./routes/clienteRoutes');
 const {
     connectToDatabase,
     sequelize
-} = require('./config/db'); // Adjust based on your db.js export
+} = require('./config/db');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-// Middleware
-app.use(express.json()); // For parsing application/json
+app.use(express.json());
 
-// Routes
+// Logging middleware para rastrear cada petición
+app.use((req, res, next) => {
+    const now = new Date().toISOString();
+    const { method, url, ip } = req;
+    console.log(`[${now}] ${method} ${url} - IP: ${ip}`);
+    next();
+});
+
+// Rutas
 app.use('/clientes', clienteRoutes);
 
-// Database connection and server start
+// Conexión a la base de datos y arranque del servidor
 async function startServer() {
     await connectToDatabase();
-    // If using Sequelize, you might want to sync models
-    // await sequelize.sync({ force: false }); // `force: true` drops tables and recreates them (use with caution!)
-    // console.log("All models were synchronized successfully.");
-
+    // await sequelize.sync({ force: false });
     app.listen(PORT, () => {
         console.log(`Client microservice running on port ${PORT}`);
     });
